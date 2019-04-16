@@ -38,13 +38,33 @@ void terminal_putentryat(unsigned char c, uint8_t color, size_t x, size_t y) {
 	terminal_buffer[index] = vga_entry(c, color);
 }
 
+void terminal_scroll(void) {
+		//Move all the terminal rows up by 1
+    memmove(terminal_buffer, terminal_buffer + VGA_WIDTH, VGA_WIDTH*(VGA_HEIGHT-1)*2);
+		//Clear the last terminal row by inserting blanks
+    for (size_t x = 0; x < VGA_WIDTH; x++) {
+        terminal_putentryat(' ', terminal_color, x, VGA_HEIGHT-1);
+    }
+}
+
 void terminal_putchar(char c) {
+	//Before printing the character on the screen, check if we need to scroll
+	if (terminal_row == VGA_HEIGHT) {
+		terminal_scroll();
+		terminal_row--;
+	}
 	unsigned char uc = c;
-	terminal_putentryat(uc, terminal_color, terminal_column, terminal_row);
+	switch (uc) {
+		case '\n': {
+			terminal_row++;
+			terminal_column = 0;
+			return;
+		}
+		default: terminal_putentryat(uc, terminal_color, terminal_column, terminal_row);
+	}
 	if (++terminal_column == VGA_WIDTH) {
 		terminal_column = 0;
-		if (++terminal_row == VGA_HEIGHT)
-			terminal_row = 0;
+		terminal_row++;
 	}
 }
 
