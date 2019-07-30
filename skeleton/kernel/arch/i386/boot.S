@@ -31,6 +31,28 @@ boot_page_table1:
 
 # The kernel entry point.
 .section .text
+
+# This will set up our new segment registers. We need to do
+# something special in order to set CS. We do what is called a
+# far jump. A jump that includes a segment as well as an offset.
+# This is declared in C as 'extern void gdt_flush()#'
+.global gdt_flush     # Allows the C code to link to this
+.extern gp            # Says that '_gp' is in another file
+gdt_flush:
+    lgdt gp        # Load the GDT with our '_gp' which is a special pointer
+    mov $0x10, %ax      # 0x10 is the offset in the GDT to our data segment
+    mov %ax, %ds
+    mov %ax, %es
+    mov %ax, %fs
+    mov %ax, %gs
+    mov %ax, %ss
+    ljmp $0x08, $reload_cs   # 0x08 is the offset to our code segment: Far jump!
+reload_cs:
+    ret               # Returns back to the C code!
+
+
+
+
 .global _start
 .type _start, @function
 _start:
@@ -110,11 +132,39 @@ _start:
 	# Set up the stack
 	movl $stack_top, %esp
 
+	# call early main
+	call kernel_early_main
+
 	# Call the global constructors.
 	call _init
 
-	# Set up GDT
 
+
+
+	# Set up GDT
+# gdtr DW 0 # For limit storage
+#      DD 0 # For base storage
+#
+# setGdt:
+#    MOV   EAX, [esp + 4]
+#    MOV   [gdtr + 2], EAX
+#    MOV   AX, [ESP + 8]
+#    MOV   [gdtr], AX
+#    LGDT  [gdtr]
+#    RET
+
+# reloadSegments:
+# 	# Reload CS register containing code selector:
+# 	JMP   0x08:reload_CS # 0x08 points at the new code selector
+# .reload_CS:
+# 	# Reload data segment registers:
+# 	MOV   AX, 0x10 # 0x10 points at the new data selector
+# 	MOV   DS, AX
+# 	MOV   ES, AX
+# 	MOV   FS, AX
+# 	MOV   GS, AX
+# 	MOV   SS, AX
+# 	RET
 
 	# Transfer control to the main kernel.
 	call kernel_main

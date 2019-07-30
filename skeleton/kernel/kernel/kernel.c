@@ -1,6 +1,11 @@
 #include <stdio.h>
-
+#include <kernel/gdt.h>
 #include <kernel/tty.h>
+
+void kernel_early_main(void) {
+  gdt_install();
+  return;
+}
 
 void kernel_main(void) {
 	terminal_initialize();
@@ -13,7 +18,6 @@ void kernel_main(void) {
   }
 	printf("hi ");
 	printf("my name is ahtif\n");
-	printf("shit on the screen");
   //printf("x");
         //printf("x\n");
 }
