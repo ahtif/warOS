@@ -39,17 +39,25 @@ boot_page_table1:
 .global gdt_flush     # Allows the C code to link to this
 .extern gp            # Says that '_gp' is in another file
 gdt_flush:
-    lgdt gp        # Load the GDT with our '_gp' which is a special pointer
-    mov $0x10, %ax      # 0x10 is the offset in the GDT to our data segment
-    mov %ax, %ds
-    mov %ax, %es
-    mov %ax, %fs
-    mov %ax, %gs
-    mov %ax, %ss
-    ljmp $0x08, $reload_cs   # 0x08 is the offset to our code segment: Far jump!
+	lgdt gp        # Load the GDT with our '_gp' which is a special pointer
+	mov $0x10, %ax      # 0x10 is the offset in the GDT to our data segment
+	mov %ax, %ds
+	mov %ax, %es
+	mov %ax, %fs
+	mov %ax, %gs
+	mov %ax, %ss
+	ljmp $0x08, $reload_cs   # 0x08 is the offset to our code segment: Far jump!
 reload_cs:
     ret               # Returns back to the C code!
 
+
+# Loads the IDT defined in '_idtp' into the processor.
+# This is declared in C as 'extern void idt_load();'
+.global idt_load
+.extern idtp
+idt_load:
+  lidt idtp
+  ret
 
 
 

@@ -1,9 +1,10 @@
 #include <stdio.h>
-#include <kernel/gdt.h>
+#include <kernel/system.h>
 #include <kernel/tty.h>
 
 void kernel_early_main(void) {
   gdt_install();
+  idt_install();
   return;
 }
 

@@ -1,6 +1,7 @@
 //extern void gdt_flush();
 void gdt_install();
-
+void idt_set_gate(unsigned char, unsigned long, unsigned short, unsigned char);
+void idt_install();
 
 // Each define here is for a specific flag in the descriptor.
 // Refer to the intel documentation for a description of what each one does.
