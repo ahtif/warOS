@@ -218,64 +218,64 @@ _start:
 #  0: Divide By Zero Exception
 _isr0:
     cli
-    pushb $0   # A normal ISR stub that pops a dummy error code to keep a
+    push $0   # A normal ISR stub that pops a dummy error code to keep a
                # uniform stack frame
-    pushb $0
-    jmp is$r_common_stub
+    push $0
+    jmp isr_common_stub
 
 #  1: Debug Exception
 _isr1:
     cli
-    pushb $0
-    pushb $1
+    push $0
+    push $1
     jmp isr_common_stub
 
 #  2: Non Maskable Interrupt Exception
 _isr2:
     cli
-    pushb $0
-    pushb $2
+    push $0
+    push $2
     jmp isr_common_stub
 
 #  3: Breakpoint Exception
 _isr3:
     cli
-    pushb $0
-    pushb $3
+    push $0
+    push $3
     jmp isr_common_stub
 
 #  4: Into Detected Overflow Exception
 _isr4:
     cli
-    pushb $0
-    pushb $4
+    push $0
+    push $4
     jmp isr_common_stub
 
 #  5: Out of Bounds Exception
 _isr5:
     cli
-    pushb $0
-    pushb $5
+    push $0
+    push $5
     jmp isr_common_stub
 
 #  6: Invalid Opcode Exception
 _isr6:
     cli
-    pushb $0
-    pushb $6
+    push $0
+    push $6
     jmp isr_common_stub
 
 #  7: No Coprocessor Exception
 _isr7:
     cli
-    pushb $0
-    pushb $7
+    push $0
+    push $7
     jmp isr_common_stub
 
 #  8: Double Fault Exception (With Error Code!)
 _isr8:
     cli
-    pushb $8        # Note that we DON'T push a value on the stack in this one!
+    push $8        # Note that we DON'T push a value on the stack in this one!
                    # It pushes one already! Use this type of stub for exceptions
                    # that pop error codes!
     jmp isr_common_stub
@@ -283,148 +283,148 @@ _isr8:
 #  9: Coprocessor Segment Overrun Exception
 _isr9:
     cli
-    pushb $0
-    pushb $9
+    push $0
+    push $9
     jmp isr_common_stub
 
 #  10: Bad TSS Exception
 _isr10:
     cli
-    pushb $10
+    push $10
     jmp isr_common_stub
 
 #  11: Segnment not Present Exception
 _isr11:
     cli
-    pushb $11
+    push $11
     jmp isr_common_stub
 
 #  12: Stack Fault Exception
 _isr12:
     cli
-    pushb $12
+    push $12
     jmp isr_common_stub
 
 #  13: General Protection Fault Exception
 _isr13:
     cli
-    pushb $13
+    push $13
     jmp isr_common_stub
 
 #  14: Page Fault Exception
 _isr14:
     cli
-    pushb $14
+    push $14
     jmp isr_common_stub
 
 
 #  15: Unknown Interrupt Exception
 _isr15:
     cli
-    pushb $0
-    pushb $15
+    push $0
+    push $15
     jmp isr_common_stub
 
 
 #  16: Coprocessor Fault Exception
 _isr16:
     cli
-    pushb $0
-    pushb $16
+    push $0
+    push $16
     jmp isr_common_stub
 
 
 #  17: Alignment Check Exception (486+)
 _isr17:
     cli
-    pushb $0
-    pushb $17
+    push $0
+    push $17
     jmp isr_common_stub
 
 #  18: Machine Check Exception (Pentium/586+)
 _isr18:
     cli
-    pushb $0
-    pushb $18
+    push $0
+    push $18
     jmp isr_common_stub
 
 #  19 to 31: Reserved Exceptions
 _isr19:
     cli
-    pushb $0
-    pushb $19
+    push $0
+    push $19
     jmp isr_common_stub
 
 _isr20:
     cli
-    pushb $0
-    pushb $20
+    push $0
+    push $20
     jmp isr_common_stub
 
 _isr21:
     cli
-    pushb $0
-    pushb $21
+    push $0
+    push $21
     jmp isr_common_stub
 
 _isr22:
     cli
-    pushb $0
-    pushb $22
+    push $0
+    push $22
     jmp isr_common_stub
 
 _isr23:
     cli
-    pushb $0
-    pushb $23
+    push $0
+    push $23
     jmp isr_common_stub
 
 _isr24:
     cli
-    pushb $0
-    pushb $24
+    push $0
+    push $24
     jmp isr_common_stub
 
 _isr25:
     cli
-    pushb $0
-    pushb $25
+    push $0
+    push $25
     jmp isr_common_stub
 
 _isr26:
     cli
-    pushb $0
-    pushb $26
+    push $0
+    push $26
     jmp isr_common_stub
 
 _isr27:
     cli
-    pushb $0
-    pushb $27
+    push $0
+    push $27
     jmp isr_common_stub
 
 _isr28:
     cli
-    pushb $0
-    pushb $28
+    push $0
+    push $28
     jmp isr_common_stub
 
 _isr29:
     cli
-    pushb $0
-    pushb $29
+    push $0
+    push $29
     jmp isr_common_stub
 
 _isr30:
     cli
-    pushb $0
-    pushb $30
+    push $0
+    push $30
     jmp isr_common_stub
 
 _isr31:
     cli
-    pushb $0
-    pushb $31
+    push $0
+    push $31
     jmp isr_common_stub
 
 # We call a C function in here. We need to let the assembler know
