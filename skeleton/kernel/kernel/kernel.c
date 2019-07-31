@@ -19,6 +19,4 @@ void kernel_main(void) {
   }
 	printf("hi ");
 	printf("my name is ahtif\n");
-  //printf("x");
-        //printf("x\n");
 }
