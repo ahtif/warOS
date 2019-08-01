@@ -3,13 +3,15 @@
 #include <kernel/tty.h>
 
 void kernel_early_main(void) {
+	terminal_initialize();
   gdt_install();
   idt_install();
+  isrs_install();
   return;
 }
 
 void kernel_main(void) {
-	terminal_initialize();
+	//terminal_initialize();
 	printf("Hello, kernel World!\n");
   char c = '0';
   for (int i = 0; i < 25; i++) {
@@ -19,4 +21,6 @@ void kernel_main(void) {
   }
 	printf("hi ");
 	printf("my name is ahtif\n");
+  int d = 5;
+  putchar(d/0);
 }
