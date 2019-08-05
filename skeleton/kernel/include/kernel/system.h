@@ -1,9 +1,8 @@
-//extern void gdt_flush();
 void gdt_install();
 void idt_set_gate(unsigned char, unsigned long, unsigned short, unsigned char);
 void idt_install();
 void isrs_install();
-
+void irq_install();
 /* This defines what the stack looks like after an ISR was running */
 struct regs
 {
@@ -12,6 +11,8 @@ struct regs
     unsigned int int_no, err_code;    /* our 'push byte #' and ecodes do this */
     unsigned int eip, cs, eflags, useresp, ss;   /* pushed by the processor automatically */
 };
+void irq_install_handler(int irq, void (*handler)(struct regs *r));
+
 
 // Each define here is for a specific flag in the descriptor.
 // Refer to the intel documentation for a description of what each one does.

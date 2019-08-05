@@ -7,6 +7,8 @@ void kernel_early_main(void) {
   gdt_install();
   idt_install();
   isrs_install();
+	irq_install();
+	 __asm__ __volatile__ ("sti"); 
   return;
 }
 
