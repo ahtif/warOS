@@ -11,14 +11,14 @@ static __inline unsigned char
 inb(unsigned short int port)
 {
   unsigned char _v;
-  __asm__ __volatile__ ("inb %w1,%0":"=a" (_v):"Nd" (port));
+  __asm__ __volatile__ ("inb %1, %0" : "=a"(_v) : "Nd"(port));
   return _v;
 }
 
 static __inline void
-outb(unsigned char value, unsigned short int port)
+outb(unsigned short int port, unsigned char value)
 {
-  __asm__ __volatile__ ("outb %b0,%w1": :"a" (value), "Nd" (port));
+  __asm__ __volatile__ ("outb %0, %1" : : "a"(value), "Nd"(port));
 }
 
 #ifdef __cplusplus

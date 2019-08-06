@@ -8,7 +8,8 @@ void kernel_early_main(void) {
   idt_install();
   isrs_install();
 	irq_install();
-	 __asm__ __volatile__ ("sti"); 
+	timer_install();
+	__asm__ __volatile__ ("sti");
   return;
 }
 
@@ -16,7 +17,7 @@ void kernel_main(void) {
 	//terminal_initialize();
 	printf("Hello, kernel World!\n");
   char c = '0';
-  for (int i = 0; i < 25; i++) {
+  for (int i = 0; i < 10; i++) {
       printf("%c\n",c);
 			if (++c >= 'z')
 				c = '0';
@@ -24,5 +25,6 @@ void kernel_main(void) {
 	printf("hi ");
 	printf("my name is ahtif\n");
   int d = 5;
-  putchar(d/0);
+	for(;;);
+ //}  //putchar(d/0);
 }
