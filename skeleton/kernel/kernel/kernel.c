@@ -9,6 +9,7 @@ void kernel_early_main(void) {
   isrs_install();
 	irq_install();
 	timer_install();
+	keyboard_install();
 	__asm__ __volatile__ ("sti");
   return;
 }
