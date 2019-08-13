@@ -6,7 +6,7 @@
 *  has been running for */
 int timer_ticks = 0;
 
-/* Alter the amount of times the timer fires per second.
+/* Alter how often the timer fires per second.
 */
 void timer_phase(int hz)
 {
@@ -30,7 +30,7 @@ void timer_handler(struct regs *r)
     *  display a message on the screen */
     if (timer_ticks % 100 == 0)
     {
-        terminal_writestring("One second has passed\n");
+        //terminal_writestring("One second has passed\n");
     }
 }
 

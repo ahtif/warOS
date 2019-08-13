@@ -12,7 +12,19 @@
 .long FLAGS
 .long CHECKSUM
 
-# Allocate the initial stack.
+
+/*
+The multiboot standard does not define the value of the stack pointer register
+(esp) and it is up to the kernel to provide a stack. This allocates room for a
+small stack by creating a symbol at the bottom of it, then allocating 16384
+bytes for it, and finally creating a symbol at the top. The stack grows
+downwards on x86. The stack is in its own section so it can be marked nobits,
+which means the kernel file is smaller because it does not contain an
+uninitialized stack. The stack on x86 must be 16-byte aligned according to the
+System V ABI standard and de-facto extensions. The compiler will assume the
+stack is properly aligned and failure to align the stack will result in
+undefined behavior.
+*/
 .section .bootstrap_stack, "aw", @nobits
 stack_bottom:
 .skip 16384 # 16 KiB
@@ -63,6 +75,7 @@ idt_load:
 .global _start
 .type _start, @function
 _start:
+
   # Physical address of boot_page_table1.
 	# TODO: I recall seeing some assembly that used a macro to do the
 	#       conversions to and from physical. Maybe this should be done in this
@@ -136,15 +149,20 @@ _start:
 	movl %cr3, %ecx
 	movl %ecx, %cr3
 
-	# Set up the stack
+  # Set up the stack
 	movl $stack_top, %esp
-
+	#Push the pointer to the Multiboot information structure.
+  push %ebx
+ 	#Push the magic value.
+  push %eax
 	# call early main
 	call kernel_early_main
 
 	# Call the global constructors.
 	call _init
 
+	movl $_kernel_start, %esi
+	movl $_kernel_end, %edi
 	# Transfer control to the main kernel.
 	call kernel_main
 
