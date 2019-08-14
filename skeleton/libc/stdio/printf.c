@@ -12,11 +12,36 @@ static bool print(const char* data, size_t length) {
 	return true;
 }
 
+char* itoa(int value, char* result, int base) {
+		// check that the base if valid
+		if (base < 2 || base > 36) { *result = '\0'; return result; }
+
+		char* ptr = result, *ptr1 = result, tmp_char;
+		int tmp_value;
+
+		do {
+			tmp_value = value;
+			value /= base;
+			*ptr++ = "zyxwvutsrqponmlkjihgfedcba9876543210123456789abcdefghijklmnopqrstuvwxyz" [35 + (tmp_value - value * base)];
+		} while ( value );
+
+		// Apply negative sign
+		if (tmp_value < 0) *ptr++ = '-';
+		*ptr-- = '\0';
+		while(ptr1 < ptr) {
+			tmp_char = *ptr;
+			*ptr--= *ptr1;
+			*ptr1++ = tmp_char;
+		}
+		return result;
+	}
+
 int printf(const char* restrict format, ...) {
 	va_list parameters;
 	va_start(parameters, format);
 
 	int written = 0;
+	char res[32];
 
 	while (*format != '\0') {
 		size_t maxrem = INT_MAX - written;
@@ -61,7 +86,44 @@ int printf(const char* restrict format, ...) {
 			if (!print(str, len))
 				return -1;
 			written += len;
-		} else {
+		} else if (*format == 'b') {
+			format++;
+		  int i = va_arg(parameters, int);
+
+			char* str = itoa(i, res, 2);
+			size_t len = strlen(str);
+			if (maxrem < len) {
+				// TODO: Set errno to EOVERFLOW.
+				return -1;
+			}
+			if (!print(str, len))
+				return -1;
+			written += len;
+		} else if (*format == 'x') {
+		format++;
+	  int i = va_arg(parameters, int);
+		char* str = itoa(i, res, 16);
+		size_t len = strlen(str);
+		if (maxrem < len) {
+			// TODO: Set errno to EOVERFLOW.
+			return -1;
+		}
+		if (!print(str, len))
+			return -1;
+		written += len;
+	} else if (*format == 'd') {
+			format++;
+		  int i = va_arg(parameters, int);
+			char* str = itoa(i, res, 10);
+			size_t len = strlen(str);
+			if (maxrem < len) {
+				// TODO: Set errno to EOVERFLOW.
+				return -1;
+			}
+			if (!print(str, len))
+				return -1;
+			written += len;
+	  }else {
 			format = format_begun_at;
 			size_t len = strlen(format);
 			if (maxrem < len) {
