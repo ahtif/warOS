@@ -5,45 +5,61 @@
 .set MAGIC,    0x1BADB002       # 'magic number' lets bootloader find the header
 .set CHECKSUM, -(MAGIC + FLAGS) # checksum of above, to prove we are multiboot
 
+.set KERNEL_ADDR_OFFSET, 0xC0000000
+.set KERNEL_PAGE_NUMBER, KERNEL_ADDR_OFFSET >> 22
+# One for kernel code, one for temporary allocation space and 5 for the heap. Each covers 4MiB
+.set KERNEL_NUM_UPPER_PAGES, 7
+
 # Declare a header as in the Multiboot Standard.
-.section .multiboot
+.section .multiboot.data, "a"
 .align 4
 .long MAGIC
 .long FLAGS
 .long CHECKSUM
 
 
-/*
-The multiboot standard does not define the value of the stack pointer register
-(esp) and it is up to the kernel to provide a stack. This allocates room for a
-small stack by creating a symbol at the bottom of it, then allocating 16384
-bytes for it, and finally creating a symbol at the top. The stack grows
-downwards on x86. The stack is in its own section so it can be marked nobits,
-which means the kernel file is smaller because it does not contain an
-uninitialized stack. The stack on x86 must be 16-byte aligned according to the
-System V ABI standard and de-facto extensions. The compiler will assume the
-stack is properly aligned and failure to align the stack will result in
-undefined behavior.
-*/
-.section .bootstrap_stack, "aw", @nobits
-stack_bottom:
-.skip 16384 # 16 KiB
-stack_top:
-
-# Preallocate pages used for paging. Don't hard-code addresses and assume they
-# are available, as the bootloader might have loaded its multiboot structures or
-# modules there. This lets the bootloader know it must avoid the addresses.
-.section .bss, "aw", @nobits
-	.align 4096
+.align 4096
+# The initial page directory used to boot into the higher half
+# Allocates seven 4MB pages for kernel, one for the initial 4MB, and six in the upper 4MB for the kernel code, kernel pile and
+# kernel heap
 boot_page_directory:
-	.skip 4096
-boot_page_table1:
-	.skip 4096
-# Further page tables may be required if the kernel grows beyond 3 MiB.
+    # Set lower half pages. This will be unmapped later on as we'll be jumping out of the lower 4MiB
+    .long 0x00000083
+    # Fill all preceding pages with 4 bytes
+    .fill (KERNEL_PAGE_NUMBER - 1), 4
+    # Set higher half pages, starting from 0 and increasing by 4MiB
+    .long 0x00000083
+    .long 0x00000083 | (1 << 22)
+    .long 0x00000083 | (2 << 22)
+    .long 0x00000083 | (3 << 22)
+    .long 0x00000083 | (4 << 22)
+    .long 0x00000083 | (5 << 22)
+    .long 0x00000083 | (6 << 22)
+     # Fill all succeeding pages with 4 bytes
+    .fill (1024 - KERNEL_PAGE_NUMBER - KERNEL_NUM_UPPER_PAGES), 4
 
 # The kernel entry point.
-.section .text
+.global _start
+.type _start, @function
+_start:
 
+	# Load in the page directory
+	mov $boot_page_directory, %ecx
+	mov %ecx, %cr3
+
+	mov %cr4, %ecx
+	# Set PSE bit in to enable 4MB pages
+	or $0x00000010, %ecx
+	mov %ecx, %cr4
+
+	# Enable paging
+	mov %cr0, %ecx
+	or $0x80000000, %ecx
+	mov %ecx, %cr0
+	jmp start_higher_half
+
+
+.section .text
 # This will set up our new segment registers. We need to do
 # something special in order to set CS. We do what is called a
 # far jump. A jump that includes a segment as well as an offset.
@@ -58,9 +74,15 @@ gdt_flush:
 	mov %ax, %fs
 	mov %ax, %gs
 	mov %ax, %ss
+
+	# Enter protected mode
+	mov %cr0, %eax
+	or $0x1, %al
+	mov %eax, %cr0
+
 	ljmp $0x08, $reload_cs   # 0x08 is the offset to our code segment: Far jump!
 reload_cs:
-    ret               # Returns back to the C code!
+  ret               # Returns back to the C code!
 
 
 # Loads the IDT defined in '_idtp' into the processor.
@@ -72,97 +94,28 @@ idt_load:
   ret
 
 
-.global _start
-.type _start, @function
-_start:
-
-  # Physical address of boot_page_table1.
-	# TODO: I recall seeing some assembly that used a macro to do the
-	#       conversions to and from physical. Maybe this should be done in this
-	#       code as well?
-	movl $(boot_page_table1 - 0xC0000000), %edi
-	# First address to map is address 0.
-	# TODO: Start at the first kernel page instead. Alternatively map the first
-	#       1 MiB as it can be generally useful, and there's no need to
-	#       specially map the VGA buffer.
-	movl $0, %esi
-	# Map 1023 pages. The 1024th will be the VGA text buffer.
-	movl $1023, %ecx
-
-
-1:
-	# Only map the kernel.
-	cmpl $(_kernel_start - 0xC0000000), %esi
-	jl 2f
-	cmpl $(_kernel_end - 0xC0000000), %esi
-	jge 3f
-
-	# Map physical address as "present, writable". Note that this maps
-	# .text and .rodata as writable. Mind security and map them as non-writable.
-	movl %esi, %edx
-	orl $0x003, %edx
-	movl %edx, (%edi)
-
-2:
-	# Size of page is 4096 bytes.
-	addl $4096, %esi
-	# Size of entries in boot_page_table1 is 4 bytes.
-	addl $4, %edi
-	# Loop to the next entry if we haven't finished.
-	loop 1b
-
-3:
-	# Map VGA video memory to 0xC03FF000 as "present, writable".
-	movl $(0x000B8000 | 0x003), boot_page_table1 - 0xC0000000 + 1023 * 4
-
-	# The page table is used at both page directory entry 0 (virtually from 0x0
-	# to 0x3FFFFF) (thus identity mapping the kernel) and page directory entry
-	# 768 (virtually from 0xC0000000 to 0xC03FFFFF) (thus mapping it in the
-	# higher half). The kernel is identity mapped because enabling paging does
-	# not change the next instruction, which continues to be physical. The CPU
-	# would instead page fault if there was no identity mapping.
-
-	# Map the page table to both virtual addresses 0x00000000 and 0xC0000000.
-	movl $(boot_page_table1 - 0xC0000000 + 0x003), boot_page_directory - 0xC0000000 + 0
-	movl $(boot_page_table1 - 0xC0000000 + 0x003), boot_page_directory - 0xC0000000 + 768 * 4
-
-	# Set cr3 to the address of the boot_page_directory.
-	movl $(boot_page_directory - 0xC0000000), %ecx
-	movl %ecx, %cr3
-
-	# Enable paging and the write-protect bit.
-	movl %cr0, %ecx
-	orl $0x80010000, %ecx
-	movl %ecx, %cr0
-
-	# Jump to higher half with an absolute jump.
-	lea 4f, %ecx
-	jmp *%ecx
-
-4:
-	# At this point, paging is fully set up and enabled.
+# At this point, paging is fully set up and enabled.
+start_higher_half:
 
 	# Unmap the identity mapping as it is now unnecessary.
-	movl $0, boot_page_directory + 0
-
-	# Reload crc3 to force a TLB flush so the changes to take effect.
-	movl %cr3, %ecx
-	movl %ecx, %cr3
+	invlpg (0)
 
   # Set up the stack
 	movl $stack_top, %esp
-	#Push the pointer to the Multiboot information structure.
-  push %ebx
+
  	#Push the magic value.
   push %eax
+	# Push multiboot header address. with the virtual offset
+  add $KERNEL_ADDR_OFFSET, %ebx
+	push %ebx
 	# call early main
 	call kernel_early_main
 
 	# Call the global constructors.
 	call _init
 
-	movl $_kernel_start, %esi
-	movl $_kernel_end, %edi
+	#movl $_kernel_start, %esi
+	#movl $_kernel_end, %edi
 	# Transfer control to the main kernel.
 	call kernel_main
 
@@ -170,6 +123,14 @@ _start:
 	cli
 1:	hlt
 	jmp 1b
+
+.section .bss
+.align 16
+.global stack_bottom
+.global stack_top
+stack_bottom:
+.fill 16384 # 16 KiB
+stack_top:
 
 # In just a few pages in this tutorial, we will add our Interrupt
 # Service Routines (ISRs) right here!
@@ -608,5 +569,3 @@ irq_common_stub:
     popa
     add $8, %esp    # Cleans up the pushed error code and pushed ISR number
     iret           # pops 5 things at once: CS, EIP, EFLAGS, SS, and ESP!
-
-.size _start, . - _start

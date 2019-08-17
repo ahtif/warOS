@@ -1,3 +1,5 @@
+#ifndef _KERNEL_SYSTEM_H
+#define _KERNEL_SYSTEM_H
 /* This defines what the stack looks like after an ISR was running */
 struct regs
 {
@@ -16,3 +18,5 @@ void irq_install();
 void irq_install_handler(int irq, void (*handler)(struct regs *r));
 void timer_install();
 void keyboard_install();
+
+#endif

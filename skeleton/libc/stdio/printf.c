@@ -1,6 +1,7 @@
 #include <limits.h>
 #include <stdbool.h>
 #include <stdarg.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -26,7 +27,7 @@ char* itoa(int value, char* result, int base) {
 		} while ( value );
 
 		// Apply negative sign
-		if (tmp_value < 0) *ptr++ = '-';
+		if (tmp_value < 0 && base == 10) *ptr++ = '-';
 		*ptr-- = '\0';
 		while(ptr1 < ptr) {
 			tmp_char = *ptr;
