@@ -10,11 +10,10 @@ extern uint32_t	*_kernel_virt_start, *_kernel_virt_end;
 extern uint32_t *stack_top, *stack_bottom;
 
 void kernel_early_main(multiboot_info_t* mb_info, uint32_t magic) {
-	if (magic != MULTIBOOT_BOOTLOADER_MAGIC)
-		abort();
+	terminal_initialize();
+	ASSERT(magic == MULTIBOOT_BOOTLOADER_MAGIC)
 	uint32_t stack_size = &stack_top - &stack_bottom;
 	uint32_t mem_size = mb_info->mem_upper + mb_info->mem_lower;
-	terminal_initialize();
 	printf("stack top: %x\nstack bottom: %x\n", &stack_top, &stack_bottom);
 	printf("stack size: %d\n", stack_size);
 	printf("mem size: %d\n", mem_size);

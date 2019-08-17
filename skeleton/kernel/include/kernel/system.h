@@ -1,5 +1,8 @@
 #ifndef _KERNEL_SYSTEM_H
 #define _KERNEL_SYSTEM_H
+
+#include <stdint.h>
+
 /* This defines what the stack looks like after an ISR was running */
 struct regs
 {
@@ -18,5 +21,12 @@ void irq_install();
 void irq_install_handler(int irq, void (*handler)(struct regs *r));
 void timer_install();
 void keyboard_install();
+
+void panic(const char*, const char*, uint32_t);
+void panic_assert(const char*, uint32_t, const char*);
+
+#define PANIC(msg) panic(msg, __FILE__, __LINE__);
+#define ASSERT(cond) ((cond) ? (void)0 : panic_assert(__FILE__, __LINE__, #cond));
+
 
 #endif
