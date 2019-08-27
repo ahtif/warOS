@@ -269,14 +269,12 @@ isr14:
     push $14
     jmp isr_common_stub
 
-
 #  15: Unknown Interrupt Exception
 isr15:
     cli
     push $0
     push $15
     jmp isr_common_stub
-
 
 #  16: Coprocessor Fault Exception
 isr16:
@@ -285,11 +283,9 @@ isr16:
     push $16
     jmp isr_common_stub
 
-
 #  17: Alignment Check Exception (486+)
 isr17:
     cli
-    push $0
     push $17
     jmp isr_common_stub
 
@@ -300,7 +296,7 @@ isr18:
     push $18
     jmp isr_common_stub
 
-#  19 to 31: Reserved Exceptions
+#  19 to 29: Reserved Exceptions
 isr19:
     cli
     push $0
@@ -367,12 +363,13 @@ isr29:
     push $29
     jmp isr_common_stub
 
+#  30: Security Exception
 isr30:
     cli
-    push $0
     push $30
     jmp isr_common_stub
 
+#  31: Reserved Exception
 isr31:
     cli
     push $0
