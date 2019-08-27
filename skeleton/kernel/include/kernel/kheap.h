@@ -1,9 +1,7 @@
-// kheap.h -- Interface for kernel heap functions, also provides
-//            a placement malloc() for use before the heap is
-//            initialised.
-
 #ifndef _KERNEL_KHEAP_H
 #define _KERNEL_KHEAP_H
+
+#include <stdbool.h>
 
 /**
    Allocate a chunk of memory, size in size. If align == 1,
@@ -14,7 +12,7 @@
    parameter representations are available in kmalloc, kmalloc_a,
    kmalloc_ap, kmalloc_p.
 **/
-void* kmalloc_int(uint32_t size, int align, uint32_t *phys);
+void* kmalloc_int(uint32_t size, bool align, uint32_t *phys);
 
 /**
    Allocate a chunk of memory, size in size. The chunk must be

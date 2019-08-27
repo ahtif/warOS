@@ -1,5 +1,4 @@
 #include <stdint.h>
-#include <stdbool.h>
 #include <kernel/paging.h>
 #include <kernel/kheap.h>
 
