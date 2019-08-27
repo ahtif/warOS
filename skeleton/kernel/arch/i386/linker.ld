@@ -31,20 +31,21 @@ SECTIONS
 
   .text ALIGN (4K) : AT (ADDR (.text) - _kernel_offset)
   {
-  *(.text)
+    *(.text)
+    *(.tables)
   }
   .rodata ALIGN (4K) : AT (ADDR (.rodata) - _kernel_offset)
   {
-  *(.rodata)
+    *(.rodata)
   }
   .data ALIGN (4K) : AT (ADDR (.data) - _kernel_offset)
   {
-  *(.data)
+    *(.data)
   }
   .bss ALIGN (4K) : AT (ADDR (.bss) - _kernel_offset)
   {
-  *(COMMON)
-  *(.bss)
+    *(COMMON)
+    *(.bss)
   }
 
   /DISCARD/ : {

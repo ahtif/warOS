@@ -132,6 +132,7 @@ stack_bottom:
 .fill 16384 # 16 KiB
 stack_top:
 
+.section .tables
 # In just a few pages in this tutorial, we will add our Interrupt
 # Service Routines (ISRs) right here!
 .global isr0

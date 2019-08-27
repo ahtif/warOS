@@ -118,7 +118,7 @@ char *exception_messages[] =
     "Reserved",
     "Reserved",
     "Reserved",
-    "Reserved",
+    "Security Exception",
     "Reserved"
 };
 
