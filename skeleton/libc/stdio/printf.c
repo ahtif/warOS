@@ -101,10 +101,10 @@ int printf(const char* restrict format, ...) {
 				return -1;
 			written += len;
 		} else if (*format == 'x') {
-		format++;
-	  int i = va_arg(parameters, int);
-		char* str = itoa(i, res, 16);
-		size_t len = strlen(str);
+			format++;
+		  int i = va_arg(parameters, int);
+			char* str = itoa(i, res, 16);
+			size_t len = strlen(str);
 		if (maxrem < len) {
 			// TODO: Set errno to EOVERFLOW.
 			return -1;

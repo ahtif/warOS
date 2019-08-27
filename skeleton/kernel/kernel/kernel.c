@@ -4,9 +4,11 @@
 #include <kernel/system.h>
 #include <kernel/tty.h>
 #include <kernel/multiboot.h>
+#include <kernel/paging.h>
 
-extern uint32_t *_kernel_phys_start, *_kernel_phys_end;
-extern uint32_t	*_kernel_virt_start, *_kernel_virt_end;
+extern void *_kernel_offset;
+extern void *_kernel_phys_start, *_kernel_phys_end;
+extern void	*_kernel_virt_start, *_kernel_virt_end;
 extern uint32_t *stack_top, *stack_bottom;
 
 void kernel_early_main(multiboot_info_t* mb_info, uint32_t magic) {
@@ -14,19 +16,24 @@ void kernel_early_main(multiboot_info_t* mb_info, uint32_t magic) {
 	ASSERT(magic == MULTIBOOT_BOOTLOADER_MAGIC)
 	uint32_t stack_size = &stack_top - &stack_bottom;
 	uint32_t mem_size = mb_info->mem_upper + mb_info->mem_lower;
+	printf("phys_start: %x, phys_end: %x\nvirt_start: %x, virt_end: %x\n",
+	&_kernel_phys_start, &_kernel_phys_end, &_kernel_virt_start, &_kernel_virt_end);
+	printf("_kernel_offset: %x, offset in dec: %d\n", &_kernel_offset, &_kernel_offset);
 	printf("stack top: %x\nstack bottom: %x\n", &stack_top, &stack_bottom);
 	printf("stack size: %d\n", stack_size);
-	printf("mem size: %d\n", mem_size);
+	printf("mem size: %d\n", mem_size*1024);
   gdt_install();
   idt_install();
-	//Setup paging
-
-
   isrs_install();
 	irq_install();
-	/*timer_install();
+  timer_install();
 	keyboard_install();
-	__asm__ __volatile__ ("sti"); */
+	init_paging(mem_size, (uint32_t)&_kernel_phys_start, (uint32_t)&_kernel_phys_end,
+	 (uint32_t)&_kernel_virt_start, (uint32_t)&_kernel_virt_end);
+ // __asm__ __volatile__ ("sti");	//Setup paging
+
+
+
   return;
 }
 

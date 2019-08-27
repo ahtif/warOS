@@ -1,6 +1,10 @@
 #ifndef _KERNEL_SYSTEM_H
 #define _KERNEL_SYSTEM_H
 
+#define KERNEL_ADDR_OFFSET 0xC0000000
+#define VIRTUAL_TO_PHYSICAL(addr) ((addr) - KERNEL_ADDR_OFFSET)
+#define PHYSICAL_TO_VIRTUAL(addr) ((addr) + KERNEL_ADDR_OFFSET)
+
 #include <stdint.h>
 
 /* This defines what the stack looks like after an ISR was running */
