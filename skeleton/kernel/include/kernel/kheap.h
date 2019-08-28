@@ -2,6 +2,7 @@
 #define _KERNEL_KHEAP_H
 
 #include <stdbool.h>
+#include <stdint.h>
 
 /**
    Allocate a chunk of memory, size in size. If align == 1,

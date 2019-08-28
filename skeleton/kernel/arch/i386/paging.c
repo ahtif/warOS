@@ -5,13 +5,18 @@
 #include <kernel/system.h>
 #include <kernel/paging.h>
 #include <kernel/kheap.h>
+#include <kernel/heap.h>
 
+#define FRAMES_PER_BITMAP 32
+#define HEAP_INDEX_SIZE 0x20000
 
 // The kernel's page directory
 page_directory_t *kernel_directory=NULL;
 
 // The current page directory;
 page_directory_t *current_directory=NULL;
+heap_t *kernel_heap = NULL;
+uint32_t placement_start, placement_address, placement_end;
 
 // A bitset of frames - used or free.
 uint32_t *frames;
@@ -21,13 +26,13 @@ uint32_t nframes;
 extern uint32_t placement_address;
 
 // Macros used in the bitset algorithms.
-#define INDEX_FROM_BIT(a) (a/(8*4))
-#define OFFSET_FROM_BIT(a) (a%(8*4))
+#define INDEX_FROM_BIT(a) (a / FRAMES_PER_BITMAP)
+#define OFFSET_FROM_BIT(a) (a % FRAMES_PER_BITMAP)
 
 // Static function to set a bit in the frames bitset
 static void set_frame(uint32_t frame_addr)
 {
-    uint32_t frame = frame_addr/0x1000;
+    uint32_t frame = frame_addr/PAGE_SIZE;
     uint32_t idx = INDEX_FROM_BIT(frame);
     uint32_t off = OFFSET_FROM_BIT(frame);
     frames[idx] |= (0x1 << off);
@@ -36,7 +41,7 @@ static void set_frame(uint32_t frame_addr)
 // Static function to clear a bit in the frames bitset
 static void clear_frame(uint32_t frame_addr)
 {
-    uint32_t frame = frame_addr/0x1000;
+    uint32_t frame = frame_addr/PAGE_SIZE;
     uint32_t idx = INDEX_FROM_BIT(frame);
     uint32_t off = OFFSET_FROM_BIT(frame);
     frames[idx] &= ~(0x1 << off);
@@ -45,7 +50,7 @@ static void clear_frame(uint32_t frame_addr)
 // Static function to test if a bit is set.
 static uint32_t test_frame(uint32_t frame_addr)
 {
-    uint32_t frame = frame_addr/0x1000;
+    uint32_t frame = frame_addr/PAGE_SIZE;
     uint32_t idx = INDEX_FROM_BIT(frame);
     uint32_t off = OFFSET_FROM_BIT(frame);
     return (frames[idx] & (0x1 << off));
@@ -88,7 +93,7 @@ void alloc_frame(page_t *page, int is_kernel, int is_writeable)
             // PANIC! no free frames!!
             PANIC("No free frames!")
         }
-        set_frame(idx*0x1000);
+        set_frame(idx*PAGE_SIZE);
         page->present = 1;
         page->rw = (is_writeable)?1:0;
         page->user = (is_kernel)?0:1;
@@ -118,10 +123,17 @@ void init_paging(uint32_t mem_size, uint32_t phys_start, uint32_t phys_end,
     // The size of physical memory. Convert to bytes
     uint32_t aligned_mem = ALIGN_UP(mem_size * 1024);
 
+    placement_start = virt_end;
+    placement_address = placement_start;
+    placement_end = placement_start + KERNEL_PLACEMENT_SIZE;
+    uint32_t heap_start = placement_end;
+    uint32_t heap_end = heap_start + KERNEL_HEAP_SIZE;
+
     uint32_t map_pstart = ALIGN_DOWN(phys_start);
     uint32_t map_pend = ALIGN_UP(phys_end);
     uint32_t map_vstart = ALIGN_DOWN(virt_start);
     uint32_t map_vend = ALIGN_UP(virt_end);
+
 
 
     // Let's make a page directory.
@@ -129,11 +141,8 @@ void init_paging(uint32_t mem_size, uint32_t phys_start, uint32_t phys_end,
     current_directory = kernel_directory;
     map_directory(kernel_directory, map_pstart, map_pend, map_vstart, map_vend);
     printf("address of dir: %x\n", (uint32_t)kernel_directory);
-    // Before we enable paging, we must register our page fault handler.
-    irq_install_handler(14, page_fault);
-    switch_page_directory(VIRTUAL_TO_PHYSICAL((uint32_t)kernel_directory));
-    nframes = aligned_mem / PAGE_SIZE;
 
+    nframes = aligned_mem / PAGE_SIZE;
     frames = (uint32_t*)kmalloc(INDEX_FROM_BIT(nframes));
     memset(frames, 0, INDEX_FROM_BIT(nframes));
     // We need to identity map (phys addr = virt addr) from
@@ -143,16 +152,28 @@ void init_paging(uint32_t mem_size, uint32_t phys_start, uint32_t phys_end,
     // inside the loop body we actually change placement_address
     // by calling kmalloc(). A while loop causes this to be
     // computed on-the-fly rather than once at the start.
-    uint32_t i = phys_start;
-    while (i < placement_address)
+    uint32_t start = ALIGN_DOWN(map_pstart);
+    uint32_t end = ALIGN_DOWN(map_pend);
+
+    for (uint32_t frame = start; frame < end; frame += PAGE_SIZE)
     {
-        // Kernel code is readable but not writeable from userspace.
-        //alloc_frame( get_page(i, 1, kernel_directory), 0, 0);
-        i += 0x1000;
+      set_frame(frame);
     }
+    // while (i < placement_address)
+    // {
+    //     // Kernel code is readable but not writeable from userspace.
+    //     //alloc_frame( get_page(i, 1, kernel_directory), 0, 0);
+    //     i += PAGE_SIZE;
+    // }
 
     // Now, enable paging!
     //switch_page_directory(kernel_directory);
+    // Before we enable paging, we must register our page fault handler.
+    irq_install_handler(14, page_fault);
+    switch_page_directory(VIRTUAL_TO_PHYSICAL((uint32_t)kernel_directory));
+    // Create the kernel heap
+    kernel_heap = heap_create(heap_start, heap_end, true, true, HEAP_INDEX_SIZE);
+
 }
 
 void switch_page_directory(page_directory_t *dir)
@@ -168,7 +189,7 @@ void switch_page_directory(page_directory_t *dir)
 // page_t *get_page(uint32_t address, int make, page_directory_t *dir)
 // {
 //     // Turn the address into an index.
-//     address /= 0x1000;
+//     address /= PAGE_SIZE;
 //     // Find the page table containing this address.
 //     uint32_t table_idx = address / 1024;
 //     if (dir->tables[table_idx]) // If this table is already assigned

@@ -30,7 +30,7 @@ void kernel_early_main(multiboot_info_t* mb_info, uint32_t magic) {
 	keyboard_install();
 	init_paging(mem_size, (uint32_t)&_kernel_phys_start, (uint32_t)&_kernel_phys_end,
 	 (uint32_t)&_kernel_virt_start, (uint32_t)&_kernel_virt_end);
- // __asm__ __volatile__ ("sti");	//Setup paging
+	__asm__ __volatile__ ("sti");	//Setup paging
 
 
 
@@ -49,6 +49,8 @@ void kernel_main(void) {
 	printf("hi ");
 	printf("my name is ahtif\n");
   int d = 5;
+	uint32_t *ptr = (uint32_t*) 0x0;
+	uint32_t fault = *ptr;
   // putchar(d/0);
 	for(;;);
 }
