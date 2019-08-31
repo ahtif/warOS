@@ -51,3 +51,8 @@ void* kmalloc(uint32_t size)
 {
     return kmalloc_int(size, false, 0);
 }
+
+void kfree(void *ptr)
+{
+    heap_free(ptr, kernel_heap);
+}

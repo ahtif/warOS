@@ -38,4 +38,10 @@ void* kmalloc_ap(uint32_t size, uint32_t *phys);
 **/
 void* kmalloc(uint32_t size);
 
+/**
+   Free memory pointed at by ptr.
+**/
+void kfree(void* ptr);
+
+
 #endif // KHEAP_H

@@ -44,6 +44,8 @@ string/memset.o \
 string/strlen.o \
 string/strndup.o \
 string/strdup.o \
+structs/linkedlist.o \
+structs/queue.o \
 
 HOSTEDOBJS=\
 $(ARCH_HOSTEDOBJS) \
