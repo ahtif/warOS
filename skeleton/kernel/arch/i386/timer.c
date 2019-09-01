@@ -1,6 +1,5 @@
 #include <io.h>
-#include <kernel/tty.h>
-#include <kernel/system.h>
+#include <kernel/timer.h>
 
 /* This will keep track of how many ticks that the system
 *  has been running for */
@@ -28,7 +27,7 @@ void timer_handler(struct regs *r)
 
     /* Every 100 clocks (approximately 1 second), we will
     *  display a message on the screen */
-    if (timer_ticks % 100 == 0)
+    if (timer_ticks % TIMER_FREQUENCY == 0)
     {
         //terminal_writestring("One second has passed\n");
     }
@@ -38,7 +37,7 @@ void timer_handler(struct regs *r)
 *  into IRQ0 */
 void timer_install()
 {
-    timer_phase(100);
+    timer_phase(TIMER_FREQUENCY);
     /* Installs 'timer_handler' to IRQ0 */
     irq_install_handler(0, timer_handler);
 }
