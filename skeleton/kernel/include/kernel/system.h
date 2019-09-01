@@ -23,6 +23,7 @@ void gdt_install();
 void idt_set_gate(unsigned char, unsigned long, unsigned short, unsigned char);
 void idt_install();
 void isrs_install();
+void isr_install_handler(int isr, void (*handler)(struct regs *r));
 void irq_install();
 void irq_install_handler(int irq, void (*handler)(struct regs *r));
 void timer_install();
