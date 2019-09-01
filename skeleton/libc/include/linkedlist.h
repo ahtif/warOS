@@ -27,6 +27,9 @@ void* list_get(linkedlist_t* list, uint32_t i);
 size_t list_size(linkedlist_t* list);
 bool list_remove(linkedlist_t *list, uint32_t i);
 
+typedef int (*comparator_t)(void* ptr1, void* ptr2);
+bool sorted_list_add(linkedlist_t* list, void* ptr, comparator_t cmp);
+
 
 #ifdef __cplusplus
 }

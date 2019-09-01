@@ -93,3 +93,10 @@ node_t *make_node(void *ptr, node_t *prev, node_t *next) {
     }
     return node;
 }
+
+bool sorted_list_add(linkedlist_t *list, void *ptr, comparator_t cmp) {
+    uint32_t i = 0;
+    while (i < list_size(list) && cmp(ptr, list_get(list, i)) > 0)
+      i++;
+    return list_insert(list, ptr, i);
+}

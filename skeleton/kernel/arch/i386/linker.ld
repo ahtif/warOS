@@ -33,6 +33,7 @@ SECTIONS
   {
     *(.text)
     *(.tables)
+    *(.scheduling)
   }
   .rodata ALIGN (4K) : AT (ADDR (.rodata) - _kernel_offset)
   {
