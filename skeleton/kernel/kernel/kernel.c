@@ -32,8 +32,6 @@ void kernel_early_main(multiboot_info_t* mb_info, uint32_t magic) {
 	 (uint32_t)&_kernel_virt_start, (uint32_t)&_kernel_virt_end);
 	__asm__ __volatile__ ("sti");	//Setup paging
 
-
-
   return;
 }
 

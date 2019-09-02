@@ -130,11 +130,11 @@ void init_paging(uint32_t mem_size, uint32_t phys_start, uint32_t phys_end,
     uint32_t heap_end = heap_start + KERNEL_HEAP_SIZE;
 
     uint32_t map_pstart = ALIGN_DOWN(phys_start);
-    uint32_t map_pend = ALIGN_UP(phys_end);
+    uint32_t map_pend = ALIGN_UP(phys_end + KERNEL_PLACEMENT_SIZE + KERNEL_HEAP_SIZE);
     uint32_t map_vstart = ALIGN_DOWN(virt_start);
-    uint32_t map_vend = ALIGN_UP(virt_end);
+    uint32_t map_vend = ALIGN_UP(heap_end);
 
-
+    printf("ps: %x, pe: %x\nvs: %x, ve: %x\n", map_pstart, map_pend, map_vstart, map_vend);
 
     // Let's make a page directory.
      kernel_directory = (page_directory_t*)kmalloc_a(sizeof(page_directory_t));
