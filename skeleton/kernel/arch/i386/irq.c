@@ -110,10 +110,15 @@ void irq_handler(struct regs *r)
     handler(r);
   }
 
+  send_eoi(r->int_no);
+}
+
+void send_eoi(int irq)
+{
   /* If the IDT entry that was invoked was greater than 40
   *  (meaning IRQ8 - 15), then we need to send an EOI to
   *  the slave controller */
-  if (r->int_no >= 40)
+  if (irq >= 40)
   {
     outb(0xA0, 0x20);
   }

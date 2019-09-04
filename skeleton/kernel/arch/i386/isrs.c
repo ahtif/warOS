@@ -170,7 +170,6 @@ void fault_handler(struct regs *r)
       /* Display the description for the Exception that occurred.
       *  In this tutorial, we will simply halt the system using an
       *  infinite loop */
-      printf("exception number: %d\n", r->int_no);
       terminal_writestring(exception_messages[r->int_no]);
       terminal_writestring(" Exception. System Halted!\n");
       for (;;);

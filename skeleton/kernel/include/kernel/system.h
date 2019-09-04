@@ -26,6 +26,7 @@ void isrs_install();
 void isr_install_handler(int isr, void (*handler)(struct regs *r));
 void irq_install();
 void irq_install_handler(int irq, void (*handler)(struct regs *r));
+void send_eoi(int);
 void timer_install();
 void keyboard_install();
 

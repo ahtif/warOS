@@ -18,7 +18,7 @@ process_t* init_process = NULL, * cleaner_process = NULL;
 
 void on_tick(struct regs* r) {
     tick_counter++;
-    // arch_acknowledge_irq(ARCH_INTERRUPT_TIMER);
+    send_eoi(r->int_no);
     if(tick_counter >= MULTITASKING_TICKS_PER_SLICE) {
         multitasking_yield();
         tick_counter = 0;

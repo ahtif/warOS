@@ -38,7 +38,7 @@ void kernel_early_main(multiboot_info_t* mb_info, uint32_t magic) {
 void kernel_main(void) {
 	//terminal_initialize();
 	uint32_t stack_size = &stack_top - &stack_bottom;
-  multitasking_init(stack_bottom, stack_size);
+  multitasking_init(&stack_bottom, stack_size);
 	printf("Hello, kernel World!\n");
   char c = '0';
   for (int i = 0; i < 10; i++) {
