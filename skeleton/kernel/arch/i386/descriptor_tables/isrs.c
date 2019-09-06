@@ -1,4 +1,4 @@
-#include <kernel/system.h>
+#include <arch/i386/system.h>
 #include <kernel/tty.h>
 
 /* These are function prototypes for all of the exception

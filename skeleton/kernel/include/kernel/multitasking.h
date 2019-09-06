@@ -1,7 +1,7 @@
 #ifndef _KERNEL_MULTITASKING_H
 #define _KERNEL_MULTITASKING_H
 
-#include <kernel/system.h>
+#include <arch/i386/system.h>
 #include <kernel/process.h>
 #include <kernel/timer.h>
 

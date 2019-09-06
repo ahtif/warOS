@@ -1,8 +1,8 @@
 #ifndef _KERNEL_PROCESS_H
 #define _KERNEL_PROCESS_H
 
-#include <kernel/system.h>
-#include <kernel/paging.h>
+#include <arch/i386/system.h>
+#include <arch/i386/paging.h>
 
 typedef enum process_level {
     USER, KERNEL

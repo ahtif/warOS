@@ -1,5 +1,5 @@
 #include <io.h>
-#include <kernel/system.h>
+#include <arch/i386/system.h>
 
 /* These are own ISRs that point to our special IRQ handler
 *  instead of the regular 'fault_handler' function */

@@ -1,7 +1,7 @@
-#ifndef _KERNEL_PAGING_H
-#define _KERNEL_PAGING_H
+#ifndef _ARCH_I386_PAGING_H
+#define _ARCH_I386_PAGING_H
 
-#include <kernel/system.h>
+#include <arch/i386/system.h>
 
 #define PAGE_SIZE_4MB 0x400000
 #define PAGE_SIZE_4KB 0x1000

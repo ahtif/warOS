@@ -1,10 +1,10 @@
 #include <linkedlist.h>
 #include <queue.h>
 #include <kernel/multitasking.h>
-#include <kernel/system.h>
+#include <arch/i386/system.h>
 #include <kernel/process.h>
 #include <kernel/kheap.h>
-#include <kernel/paging.h>
+#include <arch/i386/paging.h>
 
 extern void switch_task(struct regs* current, struct regs* next);
 

@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <kernel/system.h>
+#include <arch/i386/system.h>
 #include <kernel/tty.h>
-#include <kernel/multiboot.h>
-#include <kernel/paging.h>
+#include <arch/i386/multiboot.h>
+#include <arch/i386/paging.h>
 
 extern void *_kernel_offset;
 extern void *_kernel_phys_start, *_kernel_phys_end;
@@ -50,7 +50,7 @@ void kernel_main(void) {
 	printf("my name is ahtif\n");
   int d = 5;
 	// uint32_t *ptr = (uint32_t*) 0x0;
-	// uint32_t fault = *ptr;
+	// *ptr = 4;
   // putchar(d/0);
 	for(;;);
 }

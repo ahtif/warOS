@@ -1,6 +1,6 @@
 #include <io.h>
 #include <kernel/tty.h>
-#include <kernel/system.h>
+#include <arch/i386/system.h>
 
 /* KBDUS means US Keyboard Layout. This is a scancode table
 *  used to layout a standard US keyboard. I have left some

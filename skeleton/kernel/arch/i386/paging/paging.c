@@ -2,8 +2,8 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
-#include <kernel/system.h>
-#include <kernel/paging.h>
+#include <arch/i386/system.h>
+#include <arch/i386/paging.h>
 #include <kernel/kheap.h>
 #include <kernel/heap.h>
 
@@ -172,6 +172,7 @@ void init_paging(uint32_t mem_size, uint32_t phys_start, uint32_t phys_end,
     isr_install_handler(14, page_fault);
     switch_page_directory(VIRTUAL_TO_PHYSICAL((uint32_t)kernel_directory));
     // Create the kernel heap
+    printf("heap start: %x, heap end: %x\n", heap_start, heap_end);
     kernel_heap = heap_create(heap_start, heap_end, true, true, HEAP_INDEX_SIZE);
 
 }

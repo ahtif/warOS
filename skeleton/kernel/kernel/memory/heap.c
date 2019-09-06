@@ -1,9 +1,9 @@
 #include <stddef.h>
 #include <stdbool.h>
-#include <kernel/paging.h>
+#include <arch/i386/paging.h>
 #include <kernel/heap.h>
 #include <kernel/kheap.h>
-#include <kernel/system.h>
+#include <arch/i386/system.h>
 
 bool is_page_aligned(uint32_t addr);
 

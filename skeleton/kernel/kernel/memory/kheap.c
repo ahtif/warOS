@@ -1,6 +1,6 @@
 #include <stdint.h>
 #include <stddef.h>
-#include <kernel/paging.h>
+#include <arch/i386/paging.h>
 #include <kernel/kheap.h>
 #include <kernel/heap.h>
 

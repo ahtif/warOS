@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <kernel/system.h>
+#include <arch/i386/system.h>
 
 void panic(const char* msg, const char* file, uint32_t line)
 {

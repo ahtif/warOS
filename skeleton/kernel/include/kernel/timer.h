@@ -1,7 +1,7 @@
 #ifndef _KERNEL_TIMER_H
 #define _KERNEL_TIMER_H
 
-#include <kernel/system.h>
+#include <arch/i386/system.h>
 
 #define TIMER_FREQUENCY 100
 
