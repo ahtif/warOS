@@ -15,4 +15,5 @@ Specific software versions used:
 Additionally, need grub-file aliased to grub2-file
 
 The script build.sh can be used to build the project
+
 The script qemu.sh can be used to build and run the project using qemu
