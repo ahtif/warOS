@@ -10,7 +10,7 @@ Specific software versions used:
 * qemu 3.1.0 (need to install i386 targets)
 * xorriso 1.5.0
 
-Additionally, need grub-file aliased to grub2-file
+Additionally, need grub-file aliased to grub2-file and grub-mkrescue to be aliased to grub2-mkrescue
 
 The script build.sh can be used to build the project
 The script qemu.sh can be used to build and run the project using qemu
