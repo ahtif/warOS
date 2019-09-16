@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-#define HEAP_MAGIC 0x3BADDAD3
+#define HEAP_MAGIC 0x123890AB
 
 /**
  * A header associated with a heap entry
@@ -45,27 +45,16 @@ typedef struct {
 /**
  * Create a new heap structure between a range of addresses. Make sure these addresses don't overlap
  * with another heap
- * @param start_addr The heap's start address
- * @param end_addr  The heap's end address
- * @param is_kernel If the heap is managing kernel memory or user memory
- * @param is_writable If the contents of the heap is writable or not
- * @param index_size The permissable size of the index. The bigger the index the more granular the heap can be.
- * @return The heap or NULL if creation failed
  */
 heap_t* heap_create(uint32_t start_addr, uint32_t end_addr, bool is_kernel, bool is_writable, uint32_t index_size);
 
 /**
  * Allocate some memory on the heap
- * @param size The size of the memory
- * @param heap The heap in which to allocate
- * @return A pointer to the allocated memory or NULL if allocation failed
  */
 void* heap_alloc(size_t size, heap_t* heap);
 
 /**
  * Free some memory in the heap so that it can be reallocated
- * @param ptr The pointer to the memory to free. Should have come from heap_alloc on the same heap
- * @param heap The heap to free the memory in. Should be the same heap that it was allocated in
  */
 void heap_free(void* ptr, heap_t* heap);
 

@@ -13,7 +13,7 @@ SECTIONS
   /* The multiboot data and code will exist in low memory
     starting at 0x100000 */
 
-  . = 0x00100000;
+  . = 0x100000;
   _kernel_phys_start = .;
 
   .multiboot.data : {

@@ -4,7 +4,7 @@
 #include <kernel/kheap.h>
 #include <kernel/heap.h>
 
-// Address are defined in paging.c
+// Addresses are defined in paging.c
 extern uint32_t placement_start, placement_address, placement_end;
 extern heap_t *kernel_heap;
 
@@ -27,7 +27,7 @@ void* kmalloc_int(uint32_t size, bool align, uint32_t *phys)
     {
         *phys = placement_address;
     }
-    void* tmp = placement_address;
+    void* tmp = (void*) placement_address;
     placement_address += size;
     return tmp;
 }

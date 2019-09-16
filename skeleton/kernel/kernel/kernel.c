@@ -22,15 +22,15 @@ void kernel_early_main(multiboot_info_t* mb_info, uint32_t magic) {
 	printf("stack top: %x\nstack bottom: %x\n", &stack_top, &stack_bottom);
 	printf("stack size: %d\n", stack_size);
 	printf("mem size: %d\n", mem_size*1024);
+	init_paging(mem_size, (uint32_t)&_kernel_phys_start, (uint32_t)&_kernel_phys_end,
+	 (uint32_t)&_kernel_virt_start, (uint32_t)&_kernel_virt_end);
   gdt_install();
   idt_install();
   isrs_install();
 	irq_install();
   timer_install();
 	keyboard_install();
-	init_paging(mem_size, (uint32_t)&_kernel_phys_start, (uint32_t)&_kernel_phys_end,
-	 (uint32_t)&_kernel_virt_start, (uint32_t)&_kernel_virt_end);
-	__asm__ __volatile__ ("sti");	//Setup paging
+	__asm__ __volatile__ ("sti");
 
   return;
 }

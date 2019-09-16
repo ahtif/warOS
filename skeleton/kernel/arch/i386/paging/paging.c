@@ -22,9 +22,6 @@ uint32_t placement_start, placement_address, placement_end;
 uint32_t *frames;
 uint32_t nframes;
 
-// Defined in kheap.c
-extern uint32_t placement_address;
-
 // Macros used in the bitset algorithms.
 #define INDEX_FROM_BIT(a) (a / FRAMES_PER_BITMAP)
 #define OFFSET_FROM_BIT(a) (a % FRAMES_PER_BITMAP)
@@ -137,7 +134,7 @@ void init_paging(uint32_t mem_size, uint32_t phys_start, uint32_t phys_end,
     printf("ps: %x, pe: %x\nvs: %x, ve: %x\n", map_pstart, map_pend, map_vstart, map_vend);
 
     // Let's make a page directory.
-     kernel_directory = (page_directory_t*)kmalloc_a(sizeof(page_directory_t));
+    kernel_directory = (page_directory_t*)kmalloc_a(sizeof(page_directory_t));
     current_directory = kernel_directory;
     map_directory(kernel_directory, map_pstart, map_pend, map_vstart, map_vend);
     printf("address of dir: %x\n", (uint32_t)kernel_directory);

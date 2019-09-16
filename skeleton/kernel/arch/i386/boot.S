@@ -20,8 +20,9 @@
 
 .align 4096
 # The initial page directory used to boot into the higher half
-# Allocates seven 4MB pages for kernel, one for the initial 4MB, and six in the upper 4MB for the kernel code, kernel pile and
-# kernel heap
+# Allocates seven 4MB pages for kernel, one for the initial 4MB,
+# and six in the upper 4MB for the kernel code,
+# kernel placement memory and kernel heap
 boot_page_directory:
     # Set lower half pages. This will be unmapped later on as we'll be jumping out of the lower 4MiB
     .long 0x00000083
@@ -584,7 +585,6 @@ switch_task:
     mov 20(%esp), %edi
     # Get the next proc's state
     mov 24(%esp), %esi
-    # Changes to arch_cpu_state_t may require adjustments to the offset here
     # Save the stack pointer into the current proc's state at arch_cpu_state_t.esp
     mov %esp, 28(%edi)
     # Restore the stack pointer from the next proc's state from arch_cpu_state_t.esp
